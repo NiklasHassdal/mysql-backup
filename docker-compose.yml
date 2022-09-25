@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  mysql-backup:
+    build: .
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - BACKUP_FILENAME=${BACKUP_FILENAME}
+      - CRONTAB_EXPRESSION=${CRONTAB_EXPRESSION}
+    volumes:
+      - "./backup.sh:/root/backup.sh"
+      - "./backups/:/backups/"
+
+  db:
+    image: mysql:5.7-debian
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - "./data/:/var/lib/mysql/"
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    environment:
+      - PMA_HOST=db
+    ports:
+      - "80:80"
